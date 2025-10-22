@@ -5,7 +5,7 @@ import {
   getAllProductsHandler,
   getProductByIdHandler,
   updateProductByIdHandler,
-} from "../handlers/producthandler.js";
+} from "../handlers/productHandler.js";
 
 const productRouter = express.Router();
 
