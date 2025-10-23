@@ -1,6 +1,6 @@
 import * as UserService from "../services/userService.js";
 
-export const getAllUserHandler = async (req, res) => {
+export const getAllUserHandler = async (req, res, next) => {
   try {
     const response = await UserService.getAllUser();
 
@@ -9,7 +9,7 @@ export const getAllUserHandler = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    console.error(error);
+    next(error)
   }
 };
 
