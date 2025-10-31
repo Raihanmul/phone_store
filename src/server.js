@@ -11,8 +11,8 @@ app.use(express.json());
 
 const port = 3000;
 
-app.use("/api/users", userRouter);
-app.use("/api/products", productRouter);
+app.use("/users", userRouter);
+app.use("/products", productRouter);
 
 app.use(errorMiddleware);
 

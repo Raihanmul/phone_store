@@ -1,5 +1,10 @@
 import { pool } from "../config/db.js";
 import { ResponseError } from "../errors/responseError.js";
+import {
+  createUserSchema,
+  updateUserSchema,
+} from "../validations/userValidations.js";
+import validate from "../validations/validate.js";
 
 export const getAllUser = async () => {
   const [users] = await pool.query(
@@ -23,7 +28,9 @@ export const getUserById = async (id) => {
 };
 
 export const createUser = async (request) => {
-  const { fullname, username, email, password, role } = request;
+  const validated = validate(createUserSchema, request);
+
+  const { fullname, username, email, password, role } = validated;
 
   const [users] = await pool.query(
     "INSERT INTO users (fullname, username, email, password, role) VALUES (?, ?, ?, ?, ?)",
@@ -45,9 +52,11 @@ export const createUser = async (request) => {
 };
 
 export const updateUser = async (params, request) => {
+  const validated = validate(updateUserSchema, request);
+
   const { id } = params;
   const { fullname, username, email, role, address, phone_number, age } =
-    request;
+    validated;
   await pool.query(
     "UPDATE users SET fullname=?, username=?, email=?, role=?, address=?, phone_number=?, age=? WHERE id=?",
     [fullname, username, email, role, address, phone_number, age, id]
