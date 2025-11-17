@@ -28,7 +28,7 @@ export const updateUserSchema = z.object({
     .optional(),
   phone_number: z
     .string()
-    .regex(/^0\d{9, 14}$/, "Invalid Phone Number")
+    .regex(/^0\d{9,14}$/, "Invalid Phone Number")
     .optional(),
   age: z
     .number({ invalid_type_error: "Age must be a number" })

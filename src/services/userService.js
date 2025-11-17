@@ -5,6 +5,7 @@ import {
   updateUserSchema,
 } from "../validations/userValidations.js";
 import validate from "../validations/validate.js";
+import bcrypt from "bcrypt";
 
 export const getAllUser = async () => {
   const [users] = await pool.query(
@@ -32,9 +33,11 @@ export const createUser = async (request) => {
 
   const { fullname, username, email, password, role } = validated;
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const [users] = await pool.query(
     "INSERT INTO users (fullname, username, email, password, role) VALUES (?, ?, ?, ?, ?)",
-    [fullname, username, email, password, role]
+    [fullname, username, email, hashedPassword, role]
   );
 
   const newUser = {
@@ -55,12 +58,38 @@ export const updateUser = async (params, request) => {
   const validated = validate(updateUserSchema, request);
 
   const { id } = params;
-  const { fullname, username, email, role, address, phone_number, age } =
-    validated;
-  await pool.query(
-    "UPDATE users SET fullname=?, username=?, email=?, role=?, address=?, phone_number=?, age=? WHERE id=?",
-    [fullname, username, email, role, address, phone_number, age, id]
+  const {
+    fullname,
+    username,
+    email,
+    password,
+    role,
+    address,
+    phone_number,
+    age,
+  } = validated;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const [result] = await pool.query(
+    "UPDATE users SET fullname=?, username=?, email=?, password=?, role=?, address=?, phone_number=?, age=? WHERE id=?",
+    [
+      fullname,
+      username,
+      email,
+      hashedPassword,
+      role,
+      address,
+      phone_number,
+      age,
+      id,
+    ]
   );
+
+  if (result.affectedRows === 0) {
+    throw new ResponseError(404, "User not found");
+  }
+
   const [userUpdate] = await pool.query(
     "SELECT id, fullname, username, email, role, address, phone_number, age FROM users WHERE id=?",
     [id]
